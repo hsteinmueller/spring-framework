@@ -1,13 +1,14 @@
 name: CI
 on:
-  schedule:
-    - cron: '30 9 * * *'
+  push:
+    branches:
+      - "*"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   ci:
     name: '${{ matrix.os.name}} | Java ${{ matrix.java.version}}'
-    if: ${{ github.repository == 'spring-projects/spring-framework' }}
+    if: ${{ github.repository == 'hsteinmueller/spring-framework' }}
     runs-on: ${{ matrix.os.id }}
     timeout-minutes: 60
     strategy:
@@ -15,6 +16,8 @@ jobs:
         os:
           - id: ubuntu-latest
             name: Linux
+          - id: windows-latest
+            name: Windows
         java:
           - version: 17
             toolchain: false
@@ -45,11 +48,11 @@ jobs:
           java-distribution: ${{ matrix.java.distribution }}
           java-toolchain: ${{ matrix.java.toolchain }}
           java-version: ${{ matrix.java.version }}
-      - name: Send Notification
-        if: always()
-        uses: ./.github/actions/send-notification
-        with:
-          build-scan-url: ${{ steps.build.outputs.build-scan-url }}
-          run-name: ${{ format('{0} | {1} | Java {2}', github.ref_name, matrix.os.name, matrix.java.version) }}
-          status: ${{ job.status }}
-          webhook-url: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+#      - name: Send Notification
+#        if: always()
+#        uses: ./.github/actions/send-notification
+#        with:
+#          build-scan-url: ${{ steps.build.outputs.build-scan-url }}
+#          run-name: ${{ format('{0} | {1} | Java {2}', github.ref_name, matrix.os.name, matrix.java.version) }}
+#          status: ${{ job.status }}
+#          webhook-url: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
